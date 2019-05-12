@@ -26,6 +26,8 @@ fprintf('U difference is %f \n', norm(ref.U{1} - T1_als));
 fprintf('V difference is %f \n', norm(ref.U{2} - T2_als));
 fprintf('W difference is %f \n', norm(ref.U{3} - T3_als));
 
+fprintf('toolbox reconstruct diff is %f \n', norm(T - reconstruct(ref.U{1}, ref.U{2}, ref.U{3})));
+
 
 
 

@@ -19,7 +19,7 @@ function [Un, Vn, Wn, hist] = SGDTD_l2(X, nIter, alpha, rho, U, V, W)
         W = rand(k, r);
     end
 
-    fprintf('The initial loss before sgd is %f \n', norm(X - reconstruct(U,V,W)));
+    fprintf('The initial loss before sgd_l2 is %f \n', norm(X - reconstruct(U,V,W)));
     
     % initialize the history
     hist = zeros(nIter+1,1);
@@ -37,7 +37,7 @@ function [Un, Vn, Wn, hist] = SGDTD_l2(X, nIter, alpha, rho, U, V, W)
     
     hist(nIter+1) = norm(X - reconstruct(U,V,W));
     
-    fprintf('The reconstruct loss after sgd is %f \n', norm(X - reconstruct(U,V,W)));
+    fprintf('The reconstruct loss after sgd_l2 is %f \n', norm(X - reconstruct(U,V,W)));
     Un = U;
     Vn = V;
     Wn = W;

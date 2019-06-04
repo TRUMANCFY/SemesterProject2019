@@ -14,9 +14,9 @@ function [Un, Vn, Wn, hist] = SGDTD_l2(X, nIter, alpha, rho, U, V, W)
         W = rand(k, r);
     elseif nargin == 4
         r = min([m n k]);
-        U = rand(m, r);
-        V = rand(n, r);
-        W = rand(k, r);
+        U = rand(m, r) / r;
+        V = rand(n, r) / r;
+        W = rand(k, r) / r;
     end
 
     fprintf('The initial loss before sgd_l2 is %f \n', norm(X - reconstruct(U,V,W)));
@@ -26,6 +26,7 @@ function [Un, Vn, Wn, hist] = SGDTD_l2(X, nIter, alpha, rho, U, V, W)
     
     for ind=1:nIter
         hist(ind) = norm(X - reconstruct(U,V,W));
+        fprintf('The initial loss before sgd_l2 is %f \n', hist(ind));
         grad_U = cpGradient(X,U,V,W,rho,1);
         grad_V = cpGradient(X,V,U,W,rho,2);
         grad_W = cpGradient(X,W,U,V,rho,3);
@@ -56,19 +57,27 @@ function [Xn] = bigX(X,U,V,W,mode)
     K = size(W,1);
     
     Xn = zeros(I, R);
+
     for i = 1:I
         for r = 1:R
-            for j = 1:J
-                for k = 1:K
-                    if mode==1
-                        Xn(i,r) = Xn(i,r) + X(i,j,k) * V(j,r) * W(k,r);
-                    elseif mode==2
-                        Xn(i,r) = Xn(i,r) + X(j,i,k) * V(j,r) * W(k,r);
-                    else
-                        Xn(i,r) = Xn(i,r) + X(j,k,i) * V(j,r) * W(k,r);
-                    end
-                end
+            if mode==1
+                Xn(i, r) = V(:,r)' * double(X(i,:,:)) * W(:,r);
+            elseif mode==2
+                Xn(i, r) = V(:,r)' * double(X(:,i,:)) * W(:,r);
+            else
+                Xn(i, r) = V(:,r)' * double(X(:,:,i)) * W(:,r);
             end
+%             for j = 1:J
+%                 for k = 1:K
+%                     if mode==1
+%                         Xn(i,r) = Xn(i,r) + X(i,j,k) * V(j,r) * W(k,r);
+%                     elseif mode==2
+%                         Xn(i,r) = Xn(i,r) + X(j,i,k) * V(j,r) * W(k,r);
+%                     else
+%                         Xn(i,r) = Xn(i,r) + X(j,k,i) * V(j,r) * W(k,r);
+%                     end
+%                 end
+%             end
         end
     end
 end

@@ -6,13 +6,11 @@ function [Recon] = reconstruct(U, V, W)
 
     Recon = zeros(I,J,K);
 
-    for r=1:R
-        for i=1:I
-            for j=1:J
-                for k=1:K
-                    Recon(i,j,k) = Recon(i,j,k) + U(i,r) * V(j,r) * W(k,r);
 
-                end
+    for i=1:I
+        for j=1:J
+            for k=1:K
+                Recon(i,j,k) = sum(U(i,:) .* V(j,:) .* W(k,:));
             end
         end
     end

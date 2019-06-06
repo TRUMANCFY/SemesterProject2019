@@ -1,4 +1,4 @@
-function [Un, Vn, Wn, hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W)
+function [Un, Vn, Wn, hist, time_hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W)
 % regularized SGD Tensor Decomposition Methods
 % min 1/2|| T - T1 outer* T2 outer* T3 ||^2, given T
     m = size(X,1);
@@ -21,19 +21,28 @@ function [Un, Vn, Wn, hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W)
         W = rand(k, r) * 1e-1;
     end
     norm_tensor = norm(X);
-    fprintf('The initial loss before regularization sgd is %f \n', norm(X - reconstruct(U,V,W))/ norm_tensor);
+    
     hist = zeros(nIter+1,1);
+    hist(1) = norm(X - reconstruct(U,V,W))/ norm_tensor;
+    fprintf('The initial loss before regularization sgd is %f \n', hist(1));
+    
+    time_hist = zeros(nIter, 1);
+    
+    
+    tic;
     for ind=1:nIter
-        hist(ind) = norm(X - reconstruct(U,V,W)) / norm_tensor;
-        fprintf('The initial loss before regularization sgd is %f \n', hist(ind));
-        
         U_new = (1 - alpha) * U + alpha * star(X,U,V,W,rho,1);
-        V_new = (1 - alpha) * V + alpha * star(X,V,U,W,rho,2);
-        W_new = (1 - alpha) * W + alpha * star(X,W,U,V,rho,3);
+        V_new = (1 - alpha) * V + alpha * star(X,V,U_new,W,rho,2);
+        W_new = (1 - alpha) * W + alpha * star(X,W,U_new,V_new,rho,3);
         
         U = U_new;
         V = V_new;
         W = W_new;
+        
+        hist(ind+1) = norm(X - reconstruct(U,V,W)) / norm_tensor;
+        fprintf('Iteration: %d \n', ind);
+        fprintf('The loss %f \n', hist(ind+1));
+        time_hist(ind+1) = toc;
     end
     
     hist(nIter+1) = norm(X - reconstruct(U,V,W)) / norm_tensor;

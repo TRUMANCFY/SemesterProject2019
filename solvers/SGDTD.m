@@ -1,4 +1,4 @@
-function [Un, Vn, Wn, hist] = SGDTD(X, nIter, alpha, U, V, W)
+function [Un, Vn, Wn, hist, time_hist] = SGDTD(X, nIter, alpha, U, V, W)
 % Naive Tensor Decomposition Methods
 % min 1/2|| T - T1 outer* T2 outer* T3 ||^2, given T
     m = size(X,1);
@@ -25,18 +25,22 @@ function [Un, Vn, Wn, hist] = SGDTD(X, nIter, alpha, U, V, W)
     
     % initialize the history vector
     hist = zeros(nIter+1, 1);
-    hist(1) = norm(X - reconstruct(U,V,W));
+    time_hist = zeros(nIter+1, 1);
+    hist(1) = norm(X - reconstruct(U,V,W))/norm_tensor;
+    tic;
     for ind=1:nIter
-        
         grad_U = cpGradient(X,U,V,W,1);
-        grad_V = cpGradient(X,V,U,W,2);
-        grad_W = cpGradient(X,W,U,V,3);
-
         U = U - alpha * grad_U;
+        
+        grad_V = cpGradient(X,V,U,W,2);
         V = V - alpha * grad_V;
+        
+        grad_W = cpGradient(X,W,U,V,3);
         W = W - alpha * grad_W;
         hist(ind+1) = norm(X - reconstruct(U,V,W)) / norm_tensor;
-        fprintf('The initial loss before sgd is %f \n', hist(ind+1));
+        time_hist(ind+1) = toc;
+        fprintf('Iteration %d \n', ind);
+        fprintf('The loss %f \n', hist(ind+1));
     end
     
     hist(nIter+1) = norm(X - reconstruct(U, V, W)) / norm_tensor;

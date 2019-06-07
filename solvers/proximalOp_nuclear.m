@@ -6,7 +6,11 @@ function [X] = proximalOp_nuclear(A, lambda)
 % do svd first
 [U,S,V] = svd(A,0);
 diagS = diag(S);
+% size(U)
+% size(S)
+% size(V)
 diagS_update = proximalOp_l1(diagS,lambda);
-X = U * diag(diagS_update) * V';
+r = size(diag(diagS_update), 1);
+X = U * diag(diagS_update) * V(:,1:r)';
 end
 

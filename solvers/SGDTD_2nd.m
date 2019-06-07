@@ -15,7 +15,7 @@ function [Un, Vn, Wn, hist, time_hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W
         W = rand(k, r);
     elseif nargin == 4
         r = min([m n k]);
-%         r = r * r;
+        r = 50;
         U = rand(m, r) * 1e-1;
         V = rand(n, r) * 1e-1;
         W = rand(k, r) * 1e-1;
@@ -32,8 +32,17 @@ function [Un, Vn, Wn, hist, time_hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W
     tic;
     for ind=1:nIter
         U_new = (1 - alpha) * U + alpha * star(X,U,V,W,rho,1);
+        U_new(U_new < 0) = 0;
+%         size(U_new)
+        U_new = proximalOp_nuclear(U_new, 0.01);
+        
         V_new = (1 - alpha) * V + alpha * star(X,V,U_new,W,rho,2);
+        V_new(V_new < 0) = 0;
+        V_new = proximalOp_nuclear(V_new, 0.01);
+        
         W_new = (1 - alpha) * W + alpha * star(X,W,U_new,V_new,rho,3);
+        W_new(W_new < 0) = 0;
+        W_new = proximalOp_nuclear(W_new, 0.01);
         
         U = U_new;
         V = V_new;
@@ -43,11 +52,15 @@ function [Un, Vn, Wn, hist, time_hist] = SGDTD_2nd(X, nIter, alpha, rho, U, V, W
         fprintf('Iteration: %d \n', ind);
         fprintf('The loss %f \n', hist(ind+1));
         time_hist(ind+1) = toc;
+        
+        if hist(ind+1) > hist(ind)
+            break
+        end
     end
     
     hist(nIter+1) = norm(X - reconstruct(U,V,W)) / norm_tensor;
     
-    fprintf('The reconstruct loss after regularization sgd is %f \n', hist(nIter+1));
+    fprintf('The reconstruct loss after regularization sgd is %f \n', hist(ind+1));
     Un = U;
     Vn = V;
     Wn = W;

@@ -18,8 +18,9 @@ function [Un, Vn, Wn, hist, hist_con] = ADMM_order(X, nIter, alpha,mu, rho, U, V
         W = rand(k, r);
     elseif nargin == 5
         r = min([m n k]);
+        r = 10;
         U = rand(m, r) * 1e-1;
-        V = eye(r) * 0.5;
+        V = rand(n, r) * 1e-1;
         W = rand(k, r) * 1e-1;
     end
     

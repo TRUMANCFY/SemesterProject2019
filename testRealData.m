@@ -7,12 +7,12 @@ addpath('tensor_toolbox/');
 addpath('tensor_toolbox/met/');
 
 
-load('tensor_0_7.mat');
+load('tensor_we.mat');
 t = tensor(t_new);
 
 size(t)
 
-nIter = 1000;
+nIter = 50;
 % [T1,T2,T3, hist_sgd] = SGDTD(t,nIter,5e-2);
 % plot(hist_sgd);
 
@@ -22,9 +22,9 @@ nIter = 1000;
 % [T1_l2, T2_l2, T3_l2, hist_sgdl2] = SGDTD_l2(t, nIter, 1e-3, 1e-2);
 % plot(hist_sdgl2);
 
-[T1_2nd, T2_2nd, T3_2nd, hist_2nd] = SGDTD_2nd(t, nIter, 0.2, 1e-2);
+[T1_2nd, T2_2nd, T3_2nd, hist_2nd] = SGDTD_2nd(t, nIter, 0.1, 1e-2);
 plot(hist_2nd);
-
+[a,b] = postprocess(T1_2nd,T2_2nd);
 % [T1_admm, T2_admm, T3_admm, hist_admm, hist_con] = ADMM_order(t, nIter, 0.1, 1e-2, 1e-1);
 % plot(hist_admm);
 % hold on
